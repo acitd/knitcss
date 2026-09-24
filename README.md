@@ -1111,31 +1111,6 @@ With another configuration:
 knitcss --reset --config config/dev.ini
 ```
 
-# AST
-
-Use `--ast` when you need to inspect how Knit reads a template:
-
-```sh
-knitcss --ast index.html before
-```
-
-Available targets are:
-
-```text
-before
-after
-before-json
-after-json
-```
-
-You can request several at once:
-
-```sh
-knitcss --ast index.html before after
-```
-
-The file path is relative to `in_directory`.
-
 # Logging
 
 Use `--log` to show additional information during compilation:
