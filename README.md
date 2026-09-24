@@ -1,2 +1,1102 @@
-# knitcss
+# Knit CSS
+
 KnitCss is a powerful framework that lets you write CSS directly in your templates.
+
+```html
+<button class="!{color:white;background:black} !:hover{color:red}">
+  Button
+</button>
+```
+
+Your styles live right next to the element they belong to, making components easier to read, build and maintain without jumping back and forth between markup and separate stylesheets.
+
+And it is still CSS.
+You use the properties, selectors, pseudo-classes, media queries and other CSS features you already know.
+
+If you know CSS, you **already know** most of KnitCss.
+
+# Getting Started
+
+## Template
+
+A Knit declaration starts with `!`:
+
+```html
+<div class="!{color:red}">
+  Hello World
+</div>
+```
+
+Everything inside `{}` is normal CSS.
+
+Selectors go between `!` and `{}`:
+
+```html
+<button class="!:hover{color:red}">
+  Button
+</button>
+```
+
+At-rules work the same way:
+
+```html
+<div class="!@media(min-width:768px){display:grid}">
+  ...
+</div>
+```
+
+## Configuration
+
+Knit uses a `knitcss.ini` file.
+
+A small HTML configuration looks like this:
+
+```ini
+[knit]
+in_directory = 'src'
+out_directory = 'dist'
+css_file = 'dist/knit.css'
+
+[boundaries]
+double_string_literals[] = '"', '"'
+
+[template.html]
+extensions[] = '.html'
+boundaries[] = 'double_string_literals'
+```
+
+This tells Knit to read `.html` files from `src` and process declarations inside `"..."`.
+
+## CLI
+
+Compile once:
+
+```sh
+knitcss
+```
+
+Or watch for changes:
+
+```sh
+knitcss --watch
+```
+
+# Quick Start
+
+Create a new project configuration:
+
+```sh
+knitcss --init
+```
+
+This creates `knitcss.ini`.
+
+Create a template in your configured input directory:
+
+```html
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="knit.css">
+</head>
+<body>
+
+  <button class="
+    !{color:white;background:black;padding:10px 20px;border-radius:6px}
+    !:hover{background:gray}
+  ">
+    Button
+  </button>
+
+</body>
+</html>
+```
+
+Then start Knit:
+
+```sh
+knitcss --watch
+```
+
+Knit compiles the project immediately and keeps watching for changes.
+
+# Template Syntax
+
+## Style Declaration
+
+The simplest Knit declaration is:
+
+```text
+!{property:value}
+```
+
+For example:
+
+```html
+<div class="!{color:red}">
+  Hello World
+</div>
+```
+
+You can put multiple CSS properties in the same declaration:
+
+```html
+<div class="!{color:red;background:black;font-weight:bold}">
+  Hello World
+</div>
+```
+
+Or write separate declarations:
+
+```html
+<div class="!{color:red} !{background:black}">
+  Hello World
+</div>
+```
+
+## Selectors
+
+Put a CSS selector after `!`:
+
+```html
+<button class="!:hover{color:red}">
+  Button
+</button>
+```
+
+The general form is:
+
+```text
+!selector{declarations}
+```
+
+### Pseudo-Classes
+
+Pseudo-classes work naturally:
+
+```html
+<button class="
+  !{opacity:1}
+  !:hover{opacity:.8}
+  !:active{opacity:.6}
+">
+  Button
+</button>
+```
+
+You can use normal CSS pseudo-classes such as `:hover`, `:focus`, `:disabled` and others.
+
+### Combinators
+
+Use normal CSS combinators after `!`.
+
+Direct children:
+
+```html
+<div class="!>p{color:red}">
+  <p>Red text</p>
+</div>
+```
+
+Descendants:
+
+```html
+<div class="! .icon{opacity:.5}">
+  <span class="icon">...</span>
+</div>
+```
+
+Adjacent siblings:
+
+```html
+<div class="!+p{margin-top:0}">
+  ...
+</div>
+```
+
+General siblings:
+
+```html
+<div class="!~p{color:#666}">
+  ...
+</div>
+```
+
+Selectors can be as simple or as specific as you need, using normal CSS selector syntax.
+
+## At-Rules
+
+Put an at-rule after `!`:
+
+```html
+<div class="!@media(min-width:768px){display:grid}">
+  ...
+</div>
+```
+
+You can combine it with a default declaration:
+
+```html
+<div class="
+  !{display:block}
+  !@media(min-width:768px){display:grid}
+">
+  ...
+</div>
+```
+
+Other CSS at-rules can be used in the same way when they contain declarations:
+
+```html
+<div class="!@supports(display:grid){display:grid}">
+  ...
+</div>
+```
+
+```html
+<div class="!@container(min-width:400px){font-size:20px}">
+  ...
+</div>
+```
+
+### At-Rules with Selectors
+
+When you want an at-rule **and** a selector, put `&` between them:
+
+```html
+<button class="!@media(min-width:768px)&:hover{color:red}">
+  Button
+</button>
+```
+
+Here `&` simply means **and**: apply the declaration under this at-rule and this selector.
+
+So:
+
+```text
+!@media(min-width:768px){...}
+```
+
+means the media condition by itself, while:
+
+```text
+!@media(min-width:768px)&:hover{...}
+```
+
+adds the `:hover` selector to it.
+
+## CSS Nesting
+
+Normal CSS nesting is also supported inside a declaration:
+
+```html
+<button class="!{
+  color:black;
+
+  &:hover{
+    color:red;
+  }
+}">
+  Button
+</button>
+```
+
+Inside the CSS block, `&` has its normal CSS nesting meaning.
+
+Most examples in this documentation use separate Knit declarations instead:
+
+```html
+<button class="!{color:black} !:hover{color:red}">
+  Button
+</button>
+```
+
+This usually keeps template styles shorter and easier to scan.
+
+# Directives
+
+Directives add reusable behavior to Knit declarations.
+
+They appear after `!`:
+
+```text
+!directive{...}
+```
+
+A directive can also take arguments:
+
+```text
+!directive(value){...}
+```
+
+Knit includes two built-in directives:
+
+- `id`
+- `copy`
+
+You can define your own directives in `knitcss.ini`.
+
+## `id`
+
+`id` gives a declaration a name:
+
+```html
+<div class="!id(card){padding:20px;border-radius:8px}">
+  Card
+</div>
+```
+
+Here the declaration is named `card`.
+
+You can reference it later with `copy`.
+
+IDs may contain letters, numbers, `-` and `_`.
+
+A declaration can have one ID, and each ID must be unique in the template.
+
+## `copy`
+
+`copy` reuses a declaration:
+
+```html
+<div class="!id(card){padding:20px;border-radius:8px}">
+  First card
+</div>
+
+<div class="!copy(card){background:white}">
+  Second card
+</div>
+```
+
+The second declaration copies `card` and adds `background:white`.
+
+Local properties override copied ones:
+
+```html
+<div class="!id(text){color:red;font-weight:bold}">
+  First
+</div>
+
+<div class="!copy(text){color:blue}">
+  Second
+</div>
+```
+
+The second declaration keeps `font-weight:bold`, but its color becomes blue.
+
+### Multiple IDs
+
+Separate IDs with commas to copy more than one declaration:
+
+```html
+<div class="!copy(layout,surface,text){...}">
+  ...
+</div>
+```
+
+They are combined in the order they are listed, followed by the local declaration.
+
+### Partial Copy
+
+You can copy only part of a declaration:
+
+```html
+<div class="!copy(card.declaration){background:black}">
+  ...
+</div>
+```
+
+Available forms are:
+
+```text
+card
+card.at-rule
+card.selector
+card.declaration
+```
+
+`card` copies everything.
+
+The other forms copy only the selected part.
+
+# Custom Directives
+
+Custom directives are defined in `knitcss.ini`.
+
+A directive can add:
+
+- an at-rule
+- a selector
+- CSS properties
+
+## At-Rule Directive
+
+For example, you can create a reusable breakpoint:
+
+```ini
+[directive.medium]
+at = "@media(min-width:768px)"
+```
+
+Then use it in your template:
+
+```html
+<div class="!medium{display:grid}">
+  ...
+</div>
+```
+
+This is useful when the same condition is used throughout a project.
+
+## Selector Directive
+
+A directive can add a selector:
+
+```ini
+[directive.state]
+select[hover] = ":hover"
+select[focus] = ":focus"
+```
+
+Use it like this:
+
+```html
+<button class="!state(hover){color:red}">
+  Button
+</button>
+```
+
+## Property Directive
+
+A directive can also provide CSS properties:
+
+```ini
+[directive.stack]
+attributes = "display:flex;flex-direction:column"
+```
+
+Then:
+
+```html
+<div class="!stack{gap:10px}">
+  ...
+</div>
+```
+
+The configured properties are combined with the properties in the declaration.
+
+Local properties take precedence.
+
+## Directive Arguments
+
+Use a numeric case when a directive accepts a certain number of arguments:
+
+```ini
+[directive.breakpoint]
+at[1] = '@media(min-width:\1)'
+```
+
+Then:
+
+```html
+<div class="!breakpoint(900px){display:grid}">
+  ...
+</div>
+```
+
+`\1` is replaced with the first argument.
+
+For multiple arguments:
+
+```ini
+[directive.range]
+at[2] = '@media(min-width:\1) and (max-width:\2)'
+```
+
+```html
+<div class="!range(640px,1024px){display:grid}">
+  ...
+</div>
+```
+
+Use `\1`, `\2`, `\3` and so on to reference arguments.
+
+# Template Example
+
+Here's a small example using the main parts of Knit:
+
+```html
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="knit.css">
+</head>
+<body>
+
+  <main class="!{width:700px;max-width:100%;margin:40px auto}">
+
+    <h1 class="
+      !{font-size:32px}
+      !@media(min-width:768px){font-size:48px}
+    ">
+      Knit
+    </h1>
+
+    <button class="
+      !id(button){color:white;background:black;border:0;padding:10px 20px;border-radius:6px}
+      !:hover{opacity:.8}
+    ">
+      First Button
+    </button>
+
+    <button class="!copy(button){background:blue}">
+      Second Button
+    </button>
+
+  </main>
+
+</body>
+</html>
+```
+
+# Configuration Syntax
+
+Knit reads `knitcss.ini` from the current working directory by default.
+
+The configuration tells Knit:
+
+- where source templates are
+- where compiled files should go
+- which template files Knit should process
+- where Knit syntax is allowed inside those templates
+- which custom directives are available
+
+## Basic Syntax
+
+Configuration is organized into sections:
+
+```ini
+[knit]
+in_directory = "src"
+out_directory = "dist"
+```
+
+Strings can use single or double quotes:
+
+```ini
+name = "value"
+other = 'value'
+```
+
+Booleans are written without quotes:
+
+```ini
+enabled = true
+```
+
+Use `[]` for lists:
+
+```ini
+extensions[] = ".html"
+extensions[] = ".php"
+```
+
+You can add several values at once:
+
+```ini
+extensions[] = ".html", ".php", ".blade.php"
+```
+
+Named entries use brackets:
+
+```ini
+templates[script] = "javascript"
+```
+
+# Project Options
+
+Project options belong in `[knit]`.
+
+```ini
+[knit]
+in_directory = "src"
+out_directory = "dist"
+css_file = "dist/knit.css"
+```
+
+## `in_directory`
+
+The directory containing your source templates.
+
+```ini
+in_directory = "src"
+```
+
+## `out_directory`
+
+The directory where compiled templates are written.
+
+```ini
+out_directory = "dist"
+```
+
+## `css_file`
+
+The generated stylesheet.
+
+```ini
+css_file = "dist/knit.css"
+```
+
+These three options are required.
+
+## `cache_file`
+
+Optionally choose where Knit stores its cache:
+
+```ini
+cache_file = "dist/.knitcss"
+```
+
+If omitted, Knit uses `.knitcss` inside `out_directory`.
+
+## `exclude`
+
+Exclude paths inside the input directory:
+
+```ini
+exclude[] = "vendor"
+exclude[] = "generated"
+```
+
+An excluded directory also excludes its contents.
+
+## `signal_file`
+
+You can ask Knit to update a file when the project changes:
+
+```ini
+signal_file = "dist/.changed"
+```
+
+By default it contains the compilation timestamp.
+
+Use `signal_content` to customize it:
+
+```ini
+signal_content = "KNIT_TIME\nKNIT_PATHS"
+```
+
+Available placeholders are:
+
+`KNIT_TIME`
+
+The compilation timestamp.
+
+`KNIT_PATHS`
+
+The changed paths separated by new lines.
+
+# Replacements
+
+Use `[replacements]` for simple text replacements in compiled templates:
+
+```ini
+[replacements]
+ASSET_ROOT = "/assets"
+API_VERSION = "v2"
+```
+
+For example:
+
+```html
+<img src="ASSET_ROOT/logo.svg">
+```
+
+becomes:
+
+```html
+<img src="/assets/logo.svg">
+```
+
+`KNIT_TIME` is also available as a built-in replacement.
+
+# Boundaries
+
+Boundaries tell Knit where its syntax is allowed inside a template.
+
+For HTML, you may want Knit to process only `class` attributes:
+
+```ini
+[boundaries]
+class[] = '\sclass\s[0:]=\s[0:]"', '"'
+```
+
+Then attach the boundary to a template:
+
+```ini
+[template.html]
+extensions[] = ".html"
+boundaries[] = "class"
+```
+
+Now Knit can process:
+
+```html
+<div class="!{color:red}">
+  ...
+</div>
+```
+
+without treating every part of the HTML file as Knit syntax.
+
+## Boundary Patterns
+
+A boundary contains an opening pattern and a closing pattern:
+
+```ini
+[boundaries]
+example[] = "open", "close"
+```
+
+Patterns support a few useful matchers:
+
+```text
+\c    any character
+\s    whitespace
+\v    non-whitespace
+\n    newline
+\r    carriage return
+\t    tab
+\\    backslash
+```
+
+Matchers can have a repetition range:
+
+```text
+\s[3]      exactly 3
+\s[1:3]    from 1 to 3
+\s[:3]     up to 3
+\s[1:]     1 or more
+\s[0:]     0 or more
+```
+
+For example:
+
+```text
+\s[0:]
+```
+
+matches any amount of whitespace.
+
+# Templates
+
+A template section describes a type of source file:
+
+```ini
+[template.html]
+extensions[] = ".html"
+boundaries[] = "class"
+```
+
+## `extensions`
+
+Choose which files use the template:
+
+```ini
+extensions[] = ".html", ".blade.php"
+```
+
+Full suffixes are supported, so `.blade.php` can be configured separately from `.php`.
+
+## `boundaries`
+
+Choose the active boundaries:
+
+```ini
+boundaries[] = "class"
+```
+
+## Whitespace
+
+Template whitespace optimization is enabled by default.
+
+You can disable it:
+
+```ini
+optimize_whitespaces = false
+```
+
+Or control what is kept:
+
+```ini
+optimize_whitespaces = true
+keep_indentation = true
+keep_new_lines = true
+```
+
+If you want Knit to leave template formatting alone, use:
+
+```ini
+optimize_whitespaces = false
+```
+
+# Child Templates
+
+A region of one template can be handled by another template.
+
+For example:
+
+```ini
+[template.html]
+templates[script] = "javascript"
+```
+
+Here `script` is a configured boundary and `javascript` is another configured template.
+
+You can also assign more than one template:
+
+```ini
+templates[script][] = "javascript", "embedded"
+```
+
+# Custom Directive Configuration
+
+Custom directives use sections named:
+
+```text
+[directive.<name>]
+```
+
+For example:
+
+```ini
+[directive.medium]
+at = "@media(min-width:768px)"
+```
+
+There are three directive actions:
+
+```ini
+at = "..."
+select = "..."
+attributes = "..."
+```
+
+`at` adds an at-rule.
+
+`select` adds a selector.
+
+`attributes` adds CSS properties.
+
+A named case can match a particular argument:
+
+```ini
+[directive.state]
+select[hover] = ":hover"
+select[focus] = ":focus"
+```
+
+A numeric case matches the number of arguments:
+
+```ini
+[directive.range]
+at[2] = '@media(min-width:\1) and (max-width:\2)'
+```
+
+Index `0` handles a directive with no arguments:
+
+```ini
+[directive.example]
+select[0] = ":hover"
+```
+
+# Configuration Example
+
+Here's a small HTML configuration:
+
+```ini
+[knit]
+in_directory = "src"
+out_directory = "dist"
+css_file = "dist/knit.css"
+
+[boundaries]
+class[] = '\sclass\s[0:]=\s[0:]"', '"'
+
+[template.html]
+extensions[] = ".html"
+boundaries[] = "class"
+optimize_whitespaces = false
+
+[directive.medium]
+at = "@media(min-width:768px)"
+
+[directive.large]
+at = "@media(min-width:1024px)"
+```
+
+With this configuration:
+
+```html
+<div class="
+  !{font-size:16px}
+  !medium{font-size:18px}
+  !large{font-size:20px}
+">
+  Hello World
+</div>
+```
+
+# CLI Syntax
+
+The Knit executable is:
+
+```sh
+knitcss
+```
+
+Running it without options compiles the project once.
+
+```sh
+knitcss
+```
+
+By default, Knit uses `knitcss.ini` from the current working directory.
+
+# Watch
+
+Watch the project and recompile when files change:
+
+```sh
+knitcss --watch
+```
+
+The default check interval is one second.
+
+To use a different interval:
+
+```sh
+knitcss --watch 2
+```
+
+The value is in seconds.
+
+# Select
+
+Process only specific files:
+
+```sh
+knitcss --select index.html pages/about.html
+```
+
+Paths are relative to `in_directory`.
+
+You can select more than one file.
+
+# Config
+
+Use another configuration file:
+
+```sh
+knitcss --config config/dev.ini
+```
+
+Project paths still resolve from the current working directory.
+
+You can combine this with normal compilation options:
+
+```sh
+knitcss --config config/dev.ini --watch
+```
+
+# Init
+
+Create a default `knitcss.ini`:
+
+```sh
+knitcss --init
+```
+
+The file is created in the current directory.
+
+# Reset
+
+Clear the configured output directory:
+
+```sh
+knitcss --reset
+```
+
+With another configuration:
+
+```sh
+knitcss --reset --config config/dev.ini
+```
+
+# AST
+
+Use `--ast` when you need to inspect how Knit reads a template:
+
+```sh
+knitcss --ast index.html before
+```
+
+Available targets are:
+
+```text
+before
+after
+before-json
+after-json
+```
+
+You can request several at once:
+
+```sh
+knitcss --ast index.html before after
+```
+
+The file path is relative to `in_directory`.
+
+# Logging
+
+Use `--log` to show additional information during compilation:
+
+```sh
+knitcss --log path count
+```
+
+Available fields are:
+
+```text
+path
+timestamp
+count
+filesystem
+task
+```
+
+You can combine logging with watch mode:
+
+```sh
+knitcss --watch --log timestamp path
+```
+
+# Version
+
+Print the installed version:
+
+```sh
+knitcss --version
+```
+
+# Help
+
+Print the command reference:
+
+```sh
+knitcss --help
+```
+
+The command flags `--init`, `--reset`, `--ast`, `--version` and `--help` are separate commands, so only one of them is used at a time.
