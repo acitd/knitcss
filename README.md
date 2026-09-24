@@ -864,10 +864,16 @@ matches any amount of whitespace.
 
 # Templates
 
+Templates use sections named:
+
+```text
+[template.<name>]
+```
+
 A template section describes a type of source file:
 
 ```ini
-[template.html]
+[template.markup]
 extensions[] = ".html"
 boundaries[] = "class"
 ```
