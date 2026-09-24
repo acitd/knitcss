@@ -1151,4 +1151,4 @@ Print the command reference:
 knitcss --help
 ```
 
-The command flags `--init`, `--reset`, `--ast`, `--version` and `--help` are separate commands, so only one of them is used at a time.
+The command flags `--init`, `--reset`, `--version` and `--help` are separate commands, so only one of them is used at a time.
