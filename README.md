@@ -1123,7 +1123,7 @@ Available fields are:
 
 ```text
 path
-timestamp
+time
 count
 filesystem
 task
@@ -1132,7 +1132,7 @@ task
 You can combine logging with watch mode:
 
 ```sh
-knitcss --watch --log timestamp path
+knitcss --watch --log time path
 ```
 
 # Version
