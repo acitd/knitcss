@@ -289,24 +289,30 @@ Use an `-only` case when the style should apply only inside one breakpoint range
 </div>
 ```
 
-The standard generated configuration is:
+The standard generated `!at` directive provides these breakpoint variants:
 
-```ini
-[directive.at]
-at-rule[base-only]='@media(max-width:319px)'
-at-rule[xx-small]='@media(min-width:320px)'
-at-rule[xx-small-only]='@media(min-width:320px) and (max-width:479px)'
-at-rule[x-small]='@media(min-width:480px)'
-at-rule[x-small-only]='@media(min-width:480px) and (max-width:639px)'
-at-rule[small]='@media(min-width:640px)'
-at-rule[small-only]='@media(min-width:640px) and (max-width:767px)'
-at-rule[medium]='@media(min-width:768px)'
-at-rule[medium-only]='@media(min-width:768px) and (max-width:1023px)'
-at-rule[large]='@media(min-width:1024px)'
-at-rule[large-only]='@media(min-width:1024px) and (max-width:1279px)'
-at-rule[x-large]='@media(min-width:1280px)'
-at-rule[x-large-only]='@media(min-width:1280px) and (max-width:1535px)'
-at-rule[xx-large]='@media(min-width:1536px)'
+```text
+!at(base-only)       | max-width: 319px
+
+!at(xx-small)        | min-width: 320px
+!at(xx-small-only)   | 320px–479px
+
+!at(x-small)         | min-width: 480px
+!at(x-small-only)    | 480px–639px
+
+!at(small)           | min-width: 640px
+!at(small-only)      | 640px–767px
+
+!at(medium)          | min-width: 768px
+!at(medium-only)     | 768px–1023px
+
+!at(large)           | min-width: 1024px
+!at(large-only)      | 1024px–1279px
+
+!at(x-large)         | min-width: 1280px
+!at(x-large-only)    | 1280px–1535px
+
+!at(xx-large)        | min-width: 1536px
 ```
 
 This keeps breakpoint names consistent across templates while still compiling to normal CSS media queries.
