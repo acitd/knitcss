@@ -435,7 +435,7 @@ For example, you can create a reusable breakpoint:
 
 ```ini
 [directive.medium]
-at = "@media(min-width:768px)"
+at-rule = "@media(min-width:768px)"
 ```
 
 Then use it in your template:
@@ -454,8 +454,8 @@ A directive can add a selector:
 
 ```ini
 [directive.state]
-select[hover] = ":hover"
-select[focus] = ":focus"
+selector[hover] = ":hover"
+selector[focus] = ":focus"
 ```
 
 Use it like this:
@@ -472,7 +472,7 @@ A directive can also provide CSS properties:
 
 ```ini
 [directive.stack]
-attributes = "display:flex;flex-direction:column"
+declaration = "display:flex;flex-direction:column"
 ```
 
 Then:
@@ -493,7 +493,7 @@ Use a numeric case when a directive accepts a certain number of arguments:
 
 ```ini
 [directive.breakpoint]
-at[1] = '@media(min-width:\1)'
+at-rule[1] = '@media(min-width:\1)'
 ```
 
 Then:
@@ -878,37 +878,37 @@ at = "@media(min-width:768px)"
 There are three directive actions:
 
 ```ini
-at = "..."
-select = "..."
+at-rule = "..."
+selector = "..."
 attributes = "..."
 ```
 
-`at` adds an at-rule.
+`at-rule` adds an at-rule.
 
-`select` adds a selector.
+`selector` adds a selector.
 
-`attributes` adds CSS properties.
+`declaration` adds CSS properties.
 
 A named case can match a particular argument:
 
 ```ini
 [directive.state]
-select[hover] = ":hover"
-select[focus] = ":focus"
+selector[hover] = ":hover"
+selector[focus] = ":focus"
 ```
 
 A numeric case matches the number of arguments:
 
 ```ini
 [directive.range]
-at[2] = '@media(min-width:\1) and (max-width:\2)'
+at-rule[2] = '@media(min-width:\1) and (max-width:\2)'
 ```
 
 Index `0` handles a directive with no arguments:
 
 ```ini
 [directive.example]
-select[0] = ":hover"
+selector[0] = ":hover"
 ```
 
 # Configuration Example
@@ -930,10 +930,10 @@ boundaries[] = "class"
 optimize_whitespaces = false
 
 [directive.medium]
-at = "@media(min-width:768px)"
+at-rule = "@media(min-width:768px)"
 
 [directive.large]
-at = "@media(min-width:1024px)"
+at-rule = "@media(min-width:1024px)"
 ```
 
 With this configuration:
